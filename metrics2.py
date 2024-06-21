@@ -23,7 +23,7 @@ if __name__ == "__main__":
     ref_name = 'ref'
     eval_mode = 'confidence_interval'
 
-    if eval_mode == 'confidence_interval':
+    if eval_mode in ['confidence_interval', 'prompts15']:
         json_str_list = [f'{root_dir}/{colony_name}/runs/xxxxx_{run_i}.json' for run_i in range(30)]
     elif eval_mode == 'prompts3':
         json_str_list = [f'{root_dir}/{colony_name}/prompts/3/xxxxx.json']
@@ -31,8 +31,6 @@ if __name__ == "__main__":
         json_str_list = [f'{root_dir}/{colony_name}/prompts/9/xxxxx.json']
     elif eval_mode == 'prompts12':
         json_str_list = [f'{root_dir}/{colony_name}/prompts/12/xxxxx.json']
-    elif eval_mode == 'prompts15':
-        json_str_list = [f'{root_dir}/{colony_name}/xxxxx.json']
 
     if colony_name == 'Brown_Bluff':
         img_names = [
