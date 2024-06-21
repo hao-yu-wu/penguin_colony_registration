@@ -129,7 +129,9 @@ if __name__ == "__main__":
     colony_name = 'Devil_Island'
     # colony_name = 'Brown_Bluff'
 
-    print(f'-----------{colony_name}--------')
+    print(f'{colony_name}: \n')
+
+    test_gt = False
 
     if colony_name == 'Brown_Bluff':
         img_names = [
@@ -158,7 +160,7 @@ if __name__ == "__main__":
         ]
 
     pred_dir = f'./ATA/{colony_name}'
-    gt_dir = f'./ATA/{colony_name} - GT'
+    gt_dir = f'./ATA/{colony_name}-GT'
 
     pred_path = [os.path.join(pred_dir, name+'.json') for name in img_names]
     gt_path = [os.path.join(gt_dir, name+'.json') for name in img_names]
@@ -179,6 +181,7 @@ if __name__ == "__main__":
     if colony_name == 'Devil_Island':
         gt_mask_path = f"./ATA/{colony_name}/ref_mask.png"
         pred_mask_path = f"./ATA/{colony_name}/results/pred_mask.png"
+        if test_gt: pred_mask_path = f"./ATA/{colony_name}-GT/results/pred_mask.png"
         gt_mask = np.array(Image.open(gt_mask_path))
         gt_mask = gt_mask[...,0] > 0
         # print(gt_mask.shape, gt_mask.dtype, gt_mask.max(), gt_mask.min()) # (1308, 2444) int64 1 0
@@ -186,7 +189,7 @@ if __name__ == "__main__":
         pred_mask = np.array(Image.open(pred_mask_path))
         pred_mask = pred_mask > 0
         # Image.fromarray(gt_mask & pred_mask).save('./debug.png')
-        assert gt_mask.shape == pred_mask.shape # run render.py with ref_whole & Devil_Island
+        assert gt_mask.shape == pred_mask.shape # run render.py with ref & Devil_Island
 
         gt_masks = [gt_mask.astype(np.int64)]
         pred_masks = [pred_mask.astype(np.int64)]

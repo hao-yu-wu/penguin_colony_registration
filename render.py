@@ -363,11 +363,13 @@ if __name__ == "__main__":
     # render_top currently only works for top view, no rotation, only translation for ref view!
     # CUDA_VISIBLE_DEVICES=0 python render.py 
 
-    colony_name = 'Devil_Island'
-    # colony_name = 'Brown_Bluff'
+    # colony_name = 'Devil_Island'
+    colony_name = 'Brown_Bluff'
 
+    test_gt = False
     device = "cuda"
-    root_dir = 'ATA'
+    root_dir = './ATA'
+    ref_name = 'ref'
 
     if colony_name == 'Brown_Bluff':
         img_names = [
@@ -382,7 +384,6 @@ if __name__ == "__main__":
             'BROW_FEB96_N113_Slide28',
             'BROW_FEB96_N113_Slide36',
         ]
-        ref_name = 'ref'
     else:
         img_names = [
             '4- Group C from Photopoint 4',
@@ -395,13 +396,13 @@ if __name__ == "__main__":
             '00',
             'DEVI_1_081',
         ]
-        ref_name = 'ref_whole'
 
-    xml_path_ref = f'./{root_dir}/{colony_name}/{ref_name}.xml'
-    mesh_path = f'./{root_dir}/{colony_name}/data.ply'
-    json_file_ref = f'./{root_dir}/{colony_name}/{ref_name}.json'
+    xml_path_ref = f'{root_dir}/{colony_name}/{ref_name}.xml'
+    mesh_path = f'{root_dir}/{colony_name}/data.ply'
+    json_file_ref = f'{root_dir}/{colony_name}/{ref_name}.json'
     if not os.path.exists(json_file_ref): json_file_ref=None
-    save_dir = f'./{root_dir}/{colony_name}/results'
+    save_dir = f'{root_dir}/{colony_name}/results'
+    if test_gt: save_dir = f'{root_dir}/{colony_name}-GT/results'
 
     os.makedirs(save_dir, exist_ok=True)
     os.makedirs(os.path.join(save_dir, 'src_view'), exist_ok=True)
@@ -427,13 +428,14 @@ if __name__ == "__main__":
         
         # find the image
         for _ext in ['png', 'jpg', 'JPG', 'jpeg', 'PNG']:
-            ground_file = f'./{root_dir}/{colony_name}/{img_name}.{_ext}'
+            ground_file = f'{root_dir}/{colony_name}/{img_name}.{_ext}'
             if os.path.exists(ground_file):
                 break
         assert os.path.exists(ground_file), f'{ground_file} does not exist'
         # find mask & camera pose file
-        json_file = f'./{root_dir}/{colony_name}/{img_name}.json' # segmentation mask
-        xml_path = f'./{root_dir}/{colony_name}/{img_name}.xml' # camera pose
+        json_file = f'{root_dir}/{colony_name}/{img_name}.json' # segmentation mask
+        if test_gt: json_file = f'{root_dir}/{colony_name}-GT/{img_name}.json' # segmentation mask
+        xml_path = f'{root_dir}/{colony_name}/{img_name}.xml' # camera pose
 
         # rendered src view, resize to have same height and larger width with ground image in src view.
         the_renderer, the_data, the_cameras, start_R, start_T = prepare_renderer(device, mesh_path, xml_path, ground_file)
@@ -471,11 +473,6 @@ if __name__ == "__main__":
         to_pil_image(_src_view[0, ...].cpu()).save(f'{save_dir}/src_view/{img_name}.png')
         # mask sam
         sam_mask &= (alpha_mask > 0) & (depth_np > 0)
-        # sam_dmi, sam_dma = np.quantile(depth_np[sam_mask], 0.1), np.quantile(depth_np[sam_mask], 0.9)
-        # sam_mask &= (depth_np >= sam_dmi) & (depth_np <= sam_dma)
-        # _m = copy.deepcopy(sam_mask)
-        # sam_mask[:-1,:-1] &= _m[1:,:-1] & _m[:-1,1:] & _m[1:,1:]
-        # sam_mask[1:,1:] &= _m[1:,:-1] & _m[:-1,1:] & _m[:-1,:-1]
         sam_mask = torch.from_numpy(sam_mask[None,:,:,None].astype(np.float32))
         sam_image = ground_Img * sam_mask
         sam_image = torch.cat([sam_image, sam_mask], dim=-1)
