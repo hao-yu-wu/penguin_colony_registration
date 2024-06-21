@@ -363,8 +363,8 @@ if __name__ == "__main__":
     # render_top currently only works for top view, no rotation, only translation for ref view!
     # CUDA_VISIBLE_DEVICES=0 python render.py 
 
-    # colony_name = 'Devil_Island'
-    colony_name = 'Brown_Bluff'
+    colony_name = 'Devil_Island'
+    # colony_name = 'Brown_Bluff'
 
     test_gt = False
     device = "cuda"

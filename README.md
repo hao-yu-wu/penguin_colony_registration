@@ -66,3 +66,7 @@ python metrics.py
 # set eval_mode = confidence_interval/prompts3/promps9/prompts12/prompts15
 CUDA_VISIBLE_DEVICES=0 python metrics2.py
 ```
+
+## Contact
+- haoyuwu@cs.stonybrook.edu
+- heather.lynch@stonybrook.edu
